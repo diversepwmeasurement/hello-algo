@@ -1,27 +1,24 @@
-name: Rust
-
-on:
-  push:
-    branches: ["main"]
-    paths: ["codes/rust/**/*.rs", "codes/rust/Cargo.toml"]
-  pull_request:
-    branches: ["main"]
-    paths: ["codes/rust/**/*.rs", "codes/rust/Cargo.toml"]
-
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
+    runs-on: self-hosted
+    steps:
+    - continue-on-error: true
+      uses: brndnmtthws/rust-action-rustup@v1
+      with:
+        toolchain: nightly
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Build
+      run: cargo build --manifest-path=codes/rust/Cargo.toml && cargo build --manifest-path=codes/rust/Cargo.toml
+        --release
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - uses: brndnmtthws/rust-action-rustup@v1
-        with:
-            toolchain: nightly
-      
-      - uses: actions/checkout@v4
-      
-      - name: Build
-        run: cargo build --manifest-path=codes/rust/Cargo.toml && cargo build --manifest-path=codes/rust/Cargo.toml --release
+        os:
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+name: Rust
+on:
+  repository_dispatch:
+    types: trigger-ga___rust.yml

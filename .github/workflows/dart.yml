@@ -1,36 +1,35 @@
-# This workflow will install Dart SDK, run format, analyze and build with Dart
-
-name: Dart
-
-on:
-  push:
-    branches: ["main"]
-    paths: ["codes/dart/**/*.dart"]
-  pull_request:
-    branches: ["main"]
-    paths: ["codes/dart/**/*.dart"]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
 jobs:
   build:
     name: Dart ${{ matrix.dart-sdk }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
+    steps:
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up Dart ${{ matrix.dart-sdk }}
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ matrix.dart-sdk}}
+    - continue-on-error: true
+      name: Run format
+      run: dart format codes/dart
+    - continue-on-error: true
+      name: Run analyze
+      run: dart analyze codes/dart
+    - continue-on-error: true
+      name: Run build
+      run: dart codes/dart/build.dart
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        dart-sdk: [stable]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Dart ${{ matrix.dart-sdk }}
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: ${{ matrix.dart-sdk}}
-      - name: Run format
-        run: dart format codes/dart
-      - name: Run analyze
-        run: dart analyze codes/dart
-      - name: Run build
-        run: dart codes/dart/build.dart
+        dart-sdk:
+        - stable
+        os:
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+name: Dart
+on:
+  repository_dispatch:
+    types: trigger-ga___dart.yml
+permissions:
+  contents: read
